@@ -39,9 +39,4 @@ public class BookController {
     public void delete(@PathVariable Long id) {
         service.delete(id);
     } // TODO: 204
-    @PostMapping("/books")
-    public BookResponse create(
-            @RequestBody BookRequest request) {
-        Book saved = bookService
-    }
 }
