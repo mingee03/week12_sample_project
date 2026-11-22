@@ -1,8 +1,8 @@
-# 1단계: 빌드 환경 (Java 21 JDK)
-FROM eclipse-temurin:21-jdk AS build
+# 1단계: 빌드 환경 (Java 17)
+FROM eclipse-temurin:17-jdk AS build
 WORKDIR /app
 
-# 소스 및 빌드 파일 복사
+# Gradle 래퍼 및 설정 파일 복사
 COPY gradlew .
 COPY gradle gradle
 COPY build.gradle .
@@ -13,11 +13,11 @@ COPY src src
 RUN chmod +x ./gradlew
 RUN ./gradlew bootJar -x test --no-daemon
 
-# 2단계: 실행 환경 (Java 21 JRE)
-FROM eclipse-temurin:21-jre
+# 2단계: 실행 환경 (Java 17 JRE)
+FROM eclipse-temurin:17-jre
 WORKDIR /app
 
-# 1단계에서 빌드된 jar 파일 복사
+# 1단계에서 빌드된 JAR 파일만 복사
 COPY --from=build /app/build/libs/*.jar app.jar
 
 EXPOSE 8080
