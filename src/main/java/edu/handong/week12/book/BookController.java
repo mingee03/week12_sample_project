@@ -1,5 +1,7 @@
 package edu.handong.week12.book;
 
+import edu.handong.week12.book.dto.BookRequest;
+import edu.handong.week12.book.dto.BookResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,4 +39,9 @@ public class BookController {
     public void delete(@PathVariable Long id) {
         service.delete(id);
     } // TODO: 204
+    @PostMapping("/books")
+    public BookResponse create(
+            @RequestBody BookRequest request) {
+        Book saved = bookService
+    }
 }
