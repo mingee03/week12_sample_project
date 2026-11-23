@@ -1,4 +1,6 @@
-package edu.handong.week12;
+package edu.handong.week12.book;
 
-public class ApiError {
-}
+public record ApiError(
+        String code,
+        String message
+) {}
