@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +26,7 @@ public class BookController {
     @Operation(summary = "도서 목록 조회")
     @GetMapping
     //쿼리 파라미터를 객체로 받아서 service.findAll(pageable)을 호출하고, 조회된 Page<BookResponse>를 200로 반환한다.
-    public ResponseEntity<Page<BookResponse>> list(Pageable pageable) {
+    public ResponseEntity<Page<BookResponse>> list(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         return ResponseEntity.ok(service.findAll(pageable));
     }
 
@@ -40,6 +42,7 @@ public class BookController {
         //도서를 저장하고, 결과를 DTO로 받아 Response Entity를 통해 201과 Response Body에 담아 반환한다
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(input));
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<BookResponse> update(@PathVariable Long id, @Valid @RequestBody BookRequest input) {
         return ResponseEntity.ok(service.update(id, input));
