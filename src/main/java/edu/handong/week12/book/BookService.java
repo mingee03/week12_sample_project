@@ -20,8 +20,8 @@ public class BookService {
     }
 
     public Book findById(Long id) {
-        // 데이터 베이스에서 해당 ID의 도서를 optional 형태로 조회하고, 데이터가 존대하지 않으면 .orElseThrow()로 404처리
-        return repository.findById(id).orElseThrow();
+        // 데이터 베이스에서 해당 ID의 도서를 optional 형태로 조회하고, 데이터가 존재하지 않으면 .orElseThrow()로 404처리
+        return repository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
     }
 
     public BookResponse create(BookRequest input) {
