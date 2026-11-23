@@ -1,8 +1,10 @@
 package edu.handong.week12.book;
 
+import edu.handong.week12.book.dto.BookRequest;
+import edu.handong.week12.book.dto.BookResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class BookService {
@@ -12,25 +14,29 @@ public class BookService {
         this.repository = repository;
     }
 
-    public List<Book> findAll() {
-        return repository.findAll();
-    } // TODO STEP 6: Pagination/Sorting
+    public Page<BookResponse> findAll(Pageable pageable) {
+        // Page<Book>을  조회, .map(BookResponse::from)를 통해 각 엔티티를 DTO로 변환하여 Page<BookResponse>로 반환한다.
+        return repository.findAll(pageable).map(BookResponse::from);
+    }
 
     public Book findById(Long id) {
+        // 데이터 베이스에서 해당 ID의 도서를 optional 형태로 조회하고, 데이터가 존대하지 않으면 .orElseThrow()로 404처리
         return repository.findById(id).orElseThrow();
-    } // TODO STEP 5: 404
+    }
 
-    public Book create(Book book) {
-        return repository.save(book);
-    } // TODO STEP 3: DTO
+    public BookResponse create(BookRequest input) {
+        Book book = new Book(input.title(), input.author(), input.price());
+        return BookResponse.from(repository.save(book));
+    }
 
-    public Book update(Long id, Book input) {
+    public BookResponse update(Long id, BookRequest input) {
         Book book = findById(id);
-        book.update(input.getTitle(), input.getAuthor(), input.getPrice());
-        return repository.save(book);
+        book.update(input.title(), input.author(), input.price());
+        return BookResponse.from(repository.save(book));
     }
 
     public void delete(Long id) {
-        repository.deleteById(id);
-    } // TODO: 404 if absent
+        Book book = findById(id);
+        repository.delete(book);
+    }
 }
