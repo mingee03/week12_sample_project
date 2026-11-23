@@ -1,32 +1,24 @@
-# Week 12 Sample Project - Book REST API (학생용 Starter)
-기본 CRUD가 구현되어 있습니다. **해답 코드(DTO/Validation/Exception/Pagination/Swagger)는 제공되지 않습니다.**
+BookController.list()
+//쿼리 파라미터를 객체로 받아서 service.findAll(pageable)을 호출하고, 조회된 Page<BookResponse>를 200로 반환한다.
+public ResponseEntity<Page<BookResponse>> list(Pageable pageable) {
+    return ResponseEntity.ok(service.findAll(pageable));
+}
 
-## 실행
-- Java 17 필요
-- Gradle 8.x 설치 후 `gradle bootRun` (프로젝트에는 공식 Gradle Wrapper 바이너리가 포함되지 않았습니다.)
-- 기본값은 학습 편의상 메모리 H2 DB입니다. 재시작 시 데이터가 초기화됩니다.
-- MariaDB 실습: `docker compose up -d` 후 아래 환경 변수를 설정하여 실행하세요.
-  - `SPRING_PROFILES_ACTIVE=mariadb`
-  - `DB_URL=jdbc:mariadb://localhost:3307/week12`
-  - `DB_USERNAME=week12`, `DB_PASSWORD=week12_local_only`
-  - 처음 DB 생성 시에만 `DDL_AUTO=update` (이후 `validate` 권장)
-- **Render 배포**에서는 DB_URL/DB_USERNAME/DB_PASSWORD와 `SPRING_PROFILES_ACTIVE=mariadb`, `DDL_AUTO=validate`를 설정하고, 외부 MariaDB 접근을 사전에 확인하세요.
+BookController.create()
+// @RequestBody 로 요청을 DTO보 변환해 받고, @Valid로 입력값을 검증한다.
+public ResponseEntity<BookResponse> create(@Valid @RequestBody BookRequest input) {
+    //도서를 저장하고, 결과를 DTO로 받아 Response Entity를 통해 201과 Response Body에 담아 반환한다
+    return ResponseEntity.status(HttpStatus.CREATED).body(service.create(input));
+}
 
-## API
-- GET `/api/books`, GET `/api/books/{id}`
-- POST `/api/books`, PUT `/api/books/{id}`, DELETE `/api/books/{id}`
+BookService.findAll()
+public Page<BookResponse> findAll(Pageable pageable) {
+    // Page<Book>을  조회, .map(BookResponse::from)를 통해 각 엔티티를 DTO로 변환하여 Page<BookResponse>로 반환한다.
+    return repository.findAll(pageable).map(BookResponse::from);
+}
 
-```bash
-curl http://localhost:8080/api/books
-curl -X POST http://localhost:8080/api/books -H 'Content-Type: application/json' -d '{"title":"Clean Code","author":"Martin","price":35000}'
-```
-
-## TODO (STEP 3~7)
-1. `BookRequest`, `BookResponse` DTO 만들기
-2. Controller와 Service의 요청/응답을 DTO 중심으로 개선하고 `ResponseEntity` 사용
-3. Bean Validation 적용
-4. 전역 예외 처리: 400/404 구조 통일
-5. `Pageable` / `Sort` 구현 (`GET /api/books?page=0&size=5&sort=price,desc`)
-6. Swagger UI / OpenAPI 문서화
-
-> 테스트 결과는 `results/`에 저장하고 README에 자기 말로 분석 결과를 기록하세요.
+BookService.findById()
+public Book findById(Long id) {
+    // 데이터 베이스에서 해당 ID의 도서를 optional 형태로 조회하고, 데이터가 존대하지 않으면 .orElseThrow()로 404처리
+    return repository.findById(id).orElseThrow();
+}
